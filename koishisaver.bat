@@ -10,7 +10,11 @@ echo ==========================================================
 echo.
 echo ――――――――――【1】koishi救砖（抢救not found）―――――――
 echo.
-echo ――――――――――【2】ffmpeg 安装 （未做完）     ―――――――
+echo ――――――――――【2】ffmpeg 安装 （测试）       ―――――――
+echo.
+echo ――――――――――【3】ntqq 安装 （测试）       ―――――――
+echo.
+echo ――――――――――【4】liteloaderqqnt 安装 （测试）       ―――――――
 echo.
 echo ――――――――――【0】关闭操作系统               ―――――――
 echo.
@@ -18,6 +22,9 @@ echo ==========================================================
  
 set /p user_input=选择并进入命令：
 if %user_input%==1 goto a
+if %user_input%==2 goto b
+if %user_input%==3 goto c
+if %user_input%==4 goto d
 if %user_input%==0 goto end
 if not %user_input%=="" goto menu 
  
@@ -39,7 +46,7 @@ for /l %%i in (1,1,%idx%) do (
   echo [%%i] !Folder[%%i]!
 )
 REM 要求用户输入数字以选择一个文件夹
-set /p choice=请输入数字以选择一个文件夹:
+set /p choice=请输入数字以选择需要修复的实例:
 REM 如果只有一个结果，则直接将其设置为变量
 if %idx%==1 (
   set "SelectedFolderPath=!FolderPath[1]!"
@@ -141,6 +148,81 @@ echo.
 echo 实例迁移完成
 echo.
 goto end
+
+:b
+set ffmpegUrl=https://ghproxy.com/https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip
+set outputFile=ffmpeg.zip
+
+echo 正在下载 FFmpeg 安装包...
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%ffmpegUrl%', '%outputFile%')"
+
+echo 解压 FFmpeg 安装包...
+powershell -Command "Expand-Archive -Path %outputFile% -DestinationPath .\"
+
+echo 设置环境变量...
+set PATH=%PATH%;%CD%\ffmpeg-master-latest-win64-gpl\bin
+
+echo 测试 FFmpeg 是否成功安装...
+ffmpeg -version
+
+echo FFmpeg 安装完成！
+
+:c
+set downloadUrl=https://dldir1.qq.com/qqfile/qq/QQNT/bef02a45/QQ9.9.2.16183_x64.exe
+set outputFile=QQ9.9.2.16183_x64.exe
+
+echo.
+echo 正在下载 ntQQ 安装包...
+echo.
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%downloadUrl%', '%outputFile%')"
+
+echo.
+echo 正在打开 ntqqQQ 安装程序...
+echo.
+start %outputFile%
+
+echo.
+echo ntQQ 安装程序已启动
+echo.
+pause
+
+:d
+set downloadUrl=https://ghproxy.com/https://github.com/LiteLoaderQQNT/LiteLoaderQQNT/releases/download/0.5.3/LiteLoaderQQNT.zip
+set launcherurl=https://ghproxy.com/https://github.com/LiteLoaderQQNT/LiteLoaderQQNT/releases/download/0.5.3/LiteLoaderQQNT-Launcher_x64.exe
+set outputFolder=C:\Program Files\Tencent\QQNT\resources\app
+
+echo.
+echo 正在下载 LiteLoaderQQNT.zip...
+echo.
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%downloadUrl%', 'LiteLoaderQQNT.zip')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%launcherurl%', '%outputFolder%\LiteLoaderQQNT-Launcher_x64.exe')"
+
+echo.
+echo 正在解压 LiteLoaderQQNT.zip...
+echo.
+expand LiteLoaderQQNT.zip -F:* %outputFolder%
+powershell -Command "Expand-Archive -Path 'LiteLoaderQQNT.zip' -DestinationPath '%outputFolder%'"
+
+echo.
+echo 解压完成！
+echo.
+
+set file="C:\Program Files\Tencent\QQNT\resources\app\LiteLoaderQQNT-Launcher_x64.exe"
+
+echo.
+echo 正在以管理员身份启动 %file%...
+echo.
+
+powershell Start-Process %file% -Verb RunAs
+
+echo.
+echo %file% 启动完成。
+echo.
+
+goto end
+
+
+
 
 :end
 echo 修复完成。
