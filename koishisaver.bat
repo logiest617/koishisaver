@@ -5,18 +5,24 @@ color 02
 :menu
 cls
 echo.
-echo                        系统菜单   
+echo                        脚本菜单   
 echo ==========================================================
 echo.
-echo ――――――――――【1】koishi救砖（抢救not found）―――――――
+echo ――――――――――【1】koishi救砖（抢救not found）   ―――――――
 echo.
-echo ――――――――――【2】ffmpeg 安装 （测试）       ―――――――
+echo ――――――――――【2】ffmpeg 安装 （测试）          ―――――――
 echo.
-echo ――――――――――【3】ntqq 安装 （测试）       ―――――――
+echo ――――――――――【3】ntqq 安装 （测试）            ―――――――
 echo.
-echo ――――――――――【4】liteloaderqqnt 安装 （测试）       ―――――――
+echo ――――――――――【4】liteloaderqqnt 安装 （测试）  ―――――――
 echo.
-echo ――――――――――【0】关闭操作系统               ―――――――
+echo ――――――――――【5】qsign 安装 （测试）           ―――――――
+echo.
+echo ――――――――――【6】云崽 安装 （测试）            ―――――――
+echo.
+echo ――――――――――【7】单独部署qsign 安装 （测试）   ―――――――
+echo.
+echo ――――――――――【0】关闭脚本                     ―――――――
 echo.
 echo ==========================================================
  
@@ -25,6 +31,9 @@ if %user_input%==1 goto a
 if %user_input%==2 goto b
 if %user_input%==3 goto c
 if %user_input%==4 goto d
+if %user_input%==5 goto e
+if %user_input%==6 goto f
+if %user_input%==7 goto g
 if %user_input%==0 goto end
 if not %user_input%=="" goto menu 
  
@@ -38,23 +47,23 @@ set /a idx=0
 REM 遍历主文件夹及其子文件夹中的所有文件夹，并将存在的文件夹名填充到数组中
 for /d %%a in ("%KOISHI_PATH%\*") do (
   set /a "idx+=1"
-  set "Folder[!idx!]=%%~nxa"
-  set "FolderPath[!idx!]=%%~fa"
+  set "instance[!idx!]=%%~nxa"
+  set "instancePath[!idx!]=%%~fa"
 )
 REM 显示数组元素
 for /l %%i in (1,1,%idx%) do (
-  echo [%%i] !Folder[%%i]!
+  echo [%%i] !instance[%%i]!
 )
 REM 要求用户输入数字以选择一个文件夹
 set /p choice=请输入数字以选择需要修复的实例:
 REM 如果只有一个结果，则直接将其设置为变量
 if %idx%==1 (
-  set "SelectedFolderPath=!FolderPath[1]!"
+  set "SelectedinstancePath=!instancePath[1]!"
 ) else (
   REM 设置变量为所选文件夹的路径
-  set "SelectedFolderPath=!FolderPath[%choice%]!"
+  set "SelectedinstancePath=!instancePath[%choice%]!"
 )
-echo 所选实例为: !Folder[%choice%]!
+echo 所选实例为: !instance[%choice%]!
 
 REM 选择修复方式
 echo.
@@ -92,23 +101,23 @@ goto end
 :repair2
 rem 修复方式三的代码段...
 :: 在这里添加迁移实例的命令
-set DOWNLOAD_LINK=https://ghproxy.com/https://github.com/koishijs/boilerplate/releases/download/v1.10.0/boilerplate-v1.10.0-windows-amd64-node18.zip
+set instance_LINK=https://ghproxy.com/https://github.com/koishijs/boilerplate/releases/download/v1.10.0/boilerplate-v1.10.0-windows-amd64-node18.zip
 
 echo.
 echo 正在下载实例压缩包
 echo.
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%DOWNLOAD_LINK%', '%KOISHI_PATH%\default.zip')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%instance_LINK%', '%KOISHI_PATH%\default.zip')"
 echo.
 echo 实例压缩包下载完成
 echo.
 
-set "foldername=default"
+set "instancename=default"
 set "counter=1"
 
 for /L %%x in (1, 1, 100) do (
-    if exist "!SelectedFolderPath!\!foldername!!counter!" (
+    if exist "!SelectedinstancePath!\!instancename!!counter!" (
         set /a counter+=1
-        set "foldername=default!counter!"
+        set "instancename=default!counter!"
     ) else (
         goto :unzipFile
     )
@@ -141,9 +150,9 @@ set "destpath=%KOISHI_PATH%\default%counter%"
 echo.
 echo 正在迁移实例
 echo.
-xcopy /E /I /Y "%SelectedFolderPath%\data" "%destpath%\data"
-xcopy /E /I /Y "%SelectedFolderPath%\node_modules" "%destpath%\node_modules"
-xcopy /E /I /Y "%SelectedFolderPath%\logs" "%destpath%\logs"
+xcopy /E /I /Y "%SelectedinstancePath%\data" "%destpath%\data"
+xcopy /E /I /Y "%SelectedinstancePath%\node_modules" "%destpath%\node_modules"
+xcopy /E /I /Y "%SelectedinstancePath%\logs" "%destpath%\logs"
 echo.
 echo 实例迁移完成
 echo.
@@ -151,13 +160,13 @@ goto end
 
 :b
 set ffmpegUrl=https://ghproxy.com/https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip
-set outputFile=ffmpeg.zip
+set ffmpegoutputFile=ffmpeg.zip
 
 echo 正在下载 FFmpeg 安装包...
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%ffmpegUrl%', '%outputFile%')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%ffmpegUrl%', '%ffmpegoutputFile%')"
 
 echo 解压 FFmpeg 安装包...
-powershell -Command "Expand-Archive -Path %outputFile% -DestinationPath .\"
+powershell -Command "Expand-Archive -Path %ffmpegoutputFile% -DestinationPath .\"
 
 echo 设置环境变量...
 set PATH=%PATH%;%CD%\ffmpeg-master-latest-win64-gpl\bin
@@ -168,18 +177,18 @@ ffmpeg -version
 echo FFmpeg 安装完成！
 
 :c
-set downloadUrl=https://dldir1.qq.com/qqfile/qq/QQNT/bef02a45/QQ9.9.2.16183_x64.exe
-set outputFile=QQ9.9.2.16183_x64.exe
+set ntqqdownloadUrl=https://dldir1.qq.com/qqfile/qq/QQNT/bef02a45/QQ9.9.2.16183_x64.exe
+set ntqqoutputFile=QQ9.9.2.16183_x64.exe
 
 echo.
 echo 正在下载 ntQQ 安装包...
 echo.
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%downloadUrl%', '%outputFile%')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%ntqqdownloadUrl%', '%ntqqoutputFile%')"
 
 echo.
 echo 正在打开 ntqqQQ 安装程序...
 echo.
-start %outputFile%
+start %ntqqoutputFile%
 
 echo.
 echo ntQQ 安装程序已启动
@@ -187,38 +196,96 @@ echo.
 pause
 
 :d
-set downloadUrl=https://ghproxy.com/https://github.com/LiteLoaderQQNT/LiteLoaderQQNT/releases/download/0.5.3/LiteLoaderQQNT.zip
-set launcherurl=https://ghproxy.com/https://github.com/LiteLoaderQQNT/LiteLoaderQQNT/releases/download/0.5.3/LiteLoaderQQNT-Launcher_x64.exe
-set outputFolder=C:\Program Files\Tencent\QQNT\resources\app
+set llntqqdownloadUrl=https://ghproxy.com/https://github.com/LiteLoaderQQNT/LiteLoaderQQNT/releases/download/0.5.3/LiteLoaderQQNT.zip
+set llntqqlauncherurl=https://ghproxy.com/https://github.com/LiteLoaderQQNT/LiteLoaderQQNT/releases/download/0.5.3/LiteLoaderQQNT-Launcher_x64.exe
+set llntqqoutputFolder=C:\Program Files\Tencent\QQNT\resources\app
 
 echo.
 echo 正在下载 LiteLoaderQQNT.zip...
 echo.
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%downloadUrl%', 'LiteLoaderQQNT.zip')"
-powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%launcherurl%', '%outputFolder%\LiteLoaderQQNT-Launcher_x64.exe')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%llntqqdownloadUrl%', 'LiteLoaderQQNT.zip')"
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%llntqqlauncherurl%', '%llntqqoutputFolder%\LiteLoaderQQNT-Launcher_x64.exe')"
 
 echo.
 echo 正在解压 LiteLoaderQQNT.zip...
 echo.
-expand LiteLoaderQQNT.zip -F:* %outputFolder%
-powershell -Command "Expand-Archive -Path 'LiteLoaderQQNT.zip' -DestinationPath '%outputFolder%'"
+expand LiteLoaderQQNT.zip -F:* %llntqqoutputFolder%
+powershell -Command "Expand-Archive -Path 'LiteLoaderQQNT.zip' -DestinationPath '%llntqqoutputFolder%'"
 
 echo.
 echo 解压完成！
 echo.
 
-set file="C:\Program Files\Tencent\QQNT\resources\app\LiteLoaderQQNT-Launcher_x64.exe"
+set llntqqfile="C:\Program Files\Tencent\QQNT\resources\app\LiteLoaderQQNT-Launcher_x64.exe"
 
 echo.
-echo 正在以管理员身份启动 %file%...
+echo 正在以管理员身份启动 %llntqqfile%...
 echo.
 
-powershell Start-Process %file% -Verb RunAs
+powershell Start-Process %llntqqfile% -Verb RunAs
 
 echo.
-echo %file% 启动完成。
+echo %llntqqfile% 启动完成。
 echo.
 
+goto end
+
+
+:e 
+echo.
+echo 安装qisin前，我非常建议你看一下hf部署qsign，免费、稳定、快捷，仓库地址：
+echo https://github.com/logiest617/hf-bot
+echo.
+pause
+
+echo.
+echo 正在下载压缩包...
+echo.
+REM 在此处添加你的程序代码
+:: 下载
+set qsignurl=https://ghproxy.com/https://github.com/logiest617/unidbg-fetch-qsign-onekey/archive/refs/heads/main.zip
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%qsignurl%', 'main.zip')"
+
+:: 解压
+echo.
+echo 正在解压压缩包...
+echo.
+powershell -Command "Expand-Archive -Path main.zip -DestinationPath '.\\'"
+
+
+echo.
+echo qsign&gocq已经下载完成，位置为脚本同级目录下unidbg-fetch-qsign-onekey文件夹内
+echo 直接运行Start_Qsign.bat，并按提示输入账号和密码即可
+echo 如果有任何疑问，可以前往https://github.com/logiest617/unidbg-fetch-qsign-onekey
+echo.
+
+goto end
+
+:f 
+echo.
+echo 正在下载启动器...
+echo.
+set yunzaiurl=https://ghproxy.com/https://github.com/logiest617/YzLauncher-windows/blob/main/YzLauncher-windows.exe
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%yunzaiurl%', 'YzLauncher-windows.exe')"
+
+echo.
+echo 云崽启动器下载完成
+echo 安装nodejs以及git后脚本同级目录下寻找YzLauncher-windows.exe并运行即可
+echo odejs以及git的安装脚本正在紧急制作中
+echo.
+goto end
+
+:g
+echo.
+echo 正在下载qsign启动器...
+echo.
+set qsign2url=https://ghproxy.com/https://github.com/CikeyQi/unidbg-fetch-qsign-gui/releases/download/1.0.4/unidbg-fetch-qsign-gui-1.0.4.exe
+powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%qsign2url%', 'YzLauncher-windows.exe')"
+
+echo.
+echo qsign启动器下载完成
+echo 脚本同级目录下寻找unidbg-fetch-qsign-gui-1.0.4.exe并运行即可
+echo.
 goto end
 
 
